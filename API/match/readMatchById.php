@@ -15,15 +15,20 @@ $db = $database->getConnection();
 // initialize object
 $match = new Match($db);
 
+// get posted data
+$data = json_decode(file_get_contents("php://input"));
+
+// set match property values
+$match->id = $data->id;
 // query products
-$stmt = $match->read();
+$stmt = $match->readMatchById();
 $num = $stmt->rowCount();
 
 // check if more than 0 record found
 if($num>0){
 
     // matchs array
-    $matchs_arr=array();
+    $matches_arr=array();
 
     // retrieve our table contents
     // fetch() is faster than fetchAll()
@@ -44,10 +49,10 @@ if($num>0){
             "time" => $time
         );
 
-        array_push($matchs_arr, $match_data);
+        array_push($matches_arr, $match_data);
     }
 
-    $response['matches'] = $matchs_arr;
+    $response['matches'] = $matches_arr;
     echo json_encode($response);
 }
 

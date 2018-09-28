@@ -6,7 +6,7 @@ if(isset($_GET['id'])){
 
     $id = $_GET['id'];
 
-    $url = "http://localhost/AwladiApp/API/feature/readFeatureById.php";
+    $url = "http://localhost/FootballAPI/API/match/readMatchById.php";
 //Initiate cURL.
     $ch = curl_init($url);
 
@@ -28,17 +28,17 @@ if(isset($_GET['id'])){
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 
 //Execute the request
-    global $feature;
+    global $match;
     $json = curl_exec($ch);
     $json = json_decode($json, true);
-    $json = $json["features"];
-    $feature = $json[0];
+    $json = $json["matches"];
+    $match = $json[0];
     curl_close($ch);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $url = "http://localhost/AwladiApp/API/feature/updateFeature.php";
+    $url = "http://localhost/FootballAPI/API/match/update.php";
     //Initiate cURL.
     $ch = curl_init($url);
 
@@ -47,9 +47,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //The JSON data.
     $jsonData = array(
          'id' => $id,
-         'feature_name' => $_POST['feature_name'],
-        'verification_aspects' => $_POST['verification_aspects'],
-        'suggested_activities' => $_POST['suggested_activities']
+        'localteam_name' => $_POST['localteam_name'],
+        'localteam_score' => $_POST['localteam_score'],
+        'visitorteam_name' => $_POST['visitorteam_name'],
+        'visitorteam_score' =>  $_POST['visitorteam_score'],
+        'date' => $_POST['date'],
+        'time' =>$_POST['time'],
     );
 
     $jsonDataEncoded = json_encode($jsonData);
@@ -126,29 +129,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-title">
-                                        <h3 class="text-center title-2">تعديل السمة</h3>
+                                        <h3 class="text-center title-2">تعديل المباراة</h3>
                                     </div>
                                     <hr>
-                                    <form action="updateMatch.php?id=<?php echo $_GET['id'];?>" method="post" name="updateFeatureForm" onsubmit="return validateForm()" >
+                                    <form action="updateMatch.php?id=<?php echo $_GET['id'];?>" method="post" name="updateMatchForm" onsubmit="return validateForm()" >
 
                                         <div class="form-group">
-                                            <label for="cc-payment" class="control-label mb-1">السمة</label>
-                                            <input id="cc-pament" name="feature_name" type="text" class="form-control" aria-required="true" aria-invalid="false"
-                                                   value="<?php echo $feature['feature_name']; ?>">
+                                            <label for="cc-payment" class="control-label mb-1">اسم الفريق صاحب الملعب</label>
+                                            <input id="cc-pament" name="localteam_name" type="text" class="form-control" aria-required="true" aria-invalid="false"
+                                                   value="<?php echo $match['localteam_name']; ?>">
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="cc-payment" class="control-label mb-1">مظاهر التحقق</label>
-                                            <textarea id="cc-pament" name="verification_aspects" rows="5" dir="rtl" type="time" class="form-control" aria-required="true" aria-invalid="false"><?php echo $feature['verification_aspects']; ?></textarea>
+                                            <label for="cc-payment" class="control-label mb-1">عدد الاهداف</label>
+                                            <input id="cc-pament" name="localteam_score" type="text" class="form-control" aria-required="true" aria-invalid="false"
+                                                   value="<?php echo $match['localteam_score']; ?>">
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="cc-payment" class="control-label mb-1">اسم الفريق الضيف</label>
+                                            <input id="cc-pament" name="visitorteam_name" type="text" class="form-control" aria-required="true" aria-invalid="false"
+                                                   value="<?php echo $match['visitorteam_name']; ?>">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cc-payment" class="control-label mb-1">عدد الاهداف</label>
+                                            <input id="cc-pament" name="visitorteam_score" type="text" class="form-control" aria-required="true" aria-invalid="false"
+                                                   value="<?php echo $match['visitorteam_score']; ?>">
+                                        </div>
+
                                         <div class="form-group has-success">
-                                            <label for="cc-name" class="control-label mb-1">نشاطات مقترحة</label>
-                                            <textarea id="cc-name" name="suggested_activities" rows="5" type="text" dir="rtl" class="form-control cc-name valid" data-val="true" data-val-required="Please enter the name on card"
-                                                      autocomplete="cc-name" aria-required="true" aria-invalid="false" aria-describedby="cc-name-error"><?php echo $feature['suggested_activities']; ?></textarea>
+                                            <label for="cc-name" class="control-label mb-1">التاريخ</label>
+                                            <input id="cc-name" name="date" type="date" dir="ltr" class="form-control cc-name valid" data-val="true" data-val-required="Please enter the name on card"
+                                                   autocomplete="cc-name" aria-required="true" aria-invalid="false" aria-describedby="cc-name-error"
+                                                   value="<?php echo $match['date']; ?>">
                                             <span class="help-block field-validation-valid" data-valmsg-for="cc-name" data-valmsg-replace="true"></span>
                                         </div>
 
-                                        <div>
+                                        <div class="form-group has-success">
+                                            <label for="cc-name" class="control-label mb-1">موعد المباراة</label>
+                                            <input id="cc-name" name="time" type="time" dir="ltr" class="form-control cc-name valid" data-val="true" data-val-required="Please enter the name on card"
+                                                   autocomplete="cc-name" aria-required="true" aria-invalid="false" aria-describedby="cc-name-error"
+                                                   value="<?php echo $match['time']; ?>">
+                                            <span class="help-block field-validation-valid" data-valmsg-for="cc-name" data-valmsg-replace="true"></span>
+                                        </div>
                                             <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block">
                                                 <span id="payment-button-amount">حفظ التعديلات</span>
                                             </button>
@@ -190,13 +214,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="js/main.js"></script>
 <script>
     function validateForm() {
-        var fn = document.forms["updateFeatureForm"]["feature_name"].value;
+        /*var fn = document.forms["updateFeatureForm"]["feature_name"].value;
         var va = document.forms["updateFeatureForm"]["verification_aspects"].value;
         var sa = document.forms["updateFeatureForm"]["suggested_activities"].value;
         if (fn == "" || va == "" || sa == "") {
             alert("Please fill all the fields");
             return false;
-        }
+        }*/
+        return true;
     }
 </script>
 

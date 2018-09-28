@@ -100,7 +100,7 @@ function getFormatedTime($timestamp){
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Awladi App</title>
+    <title>Football App</title>
     <link rel="icon">
 
     <!-- Fontfaces CSS-->
@@ -177,7 +177,7 @@ function getFormatedTime($timestamp){
                                                     <td class=\"text-left\">".$match['visitorteam_name']."</td>
                                                     <td class=\"text-left\">".$match['date']."</td>
                                                     <td class=\"text-left\">".getFormatedTime($match['time'])."</td>
-                                                    <td class=\"text-left\"><a href='updateFeature.php?id=".$match['id']."'>Update</a></td>
+                                                    <td class=\"text-left\"><a href='updateMatch.php?id=".$match['id']."'>Update</a></td>
                                                     <td class=\"text-left\"><a href='index.php?id=".$match['id']."'>Delete</a></td>
                                                 </tr>";
                                             }

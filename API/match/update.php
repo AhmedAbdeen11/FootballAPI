@@ -10,31 +10,35 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // get database connection
 include_once '../config/database.php';
 
-// instantiate analytics object
+// instantiate match object
 include_once '../objects/match.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$user = new User($db);
+$match = new Match($db);
 
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
 
 // set match property values
-$user->id = $data->id;
-$user->name = $data->name;
-$user->img = $data->img;
-$user->type = $data->type;
+$match->id = $data->id;
+$match->localteam_name = $data->localteam_name;
+$match->localteam_score = $data->localteam_score;
+$match->visitorteam_name = $data->visitorteam_name;
+$match->visitorteam_score = $data->visitorteam_score;
+$match->date = $data->date;
+$match->time = $data->time;
 
-// create the analytics
-if($user->update()){
+// create the match
+if($match->update()){
+
     echo '{';
-    echo '"message": "User Updated."';
+    echo '"message": "Match updated."';
     echo '}';
 }
 
-// if unable to signup, tell the analytics
+// if unable to signup, tell the match
 else{
     http_response_code(404);
     echo '{';
