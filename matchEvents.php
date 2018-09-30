@@ -3,8 +3,38 @@
 
 //checkLogin();
 checkDeleteRequest();
-getMatches();
 
+if(isset($_GET['match_id'])){
+
+    $id = $_GET['match_id'];
+
+    $url = "http://localhost/FootballAPI/API/event/readEventsByMatchId.php";
+//Initiate cURL.
+    $ch = curl_init($url);
+
+    //The JSON data.
+    $jsonData = array(
+        'match_id' => $id
+    );
+
+    $jsonDataEncoded = json_encode($jsonData);
+
+//Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+//Execute the request
+    global $json;
+    $json = curl_exec($ch);
+    $json = json_decode($json, true);
+    curl_close($ch);
+}
 
 
 /*function checkLogin(){
@@ -22,27 +52,6 @@ function checkDeleteRequest(){
     if(isset($_GET['id'])){
         deleteMatch($_GET['id']);
     }
-}
-
-function getMatches(){
-    $url = "http://localhost/FootballAPI/API/match/read.php";
-//Initiate cURL.
-    $ch = curl_init($url);
-
-
-//Tell cURL that we want to send a POST request.
-    curl_setopt($ch, CURLOPT_POST, 1);
-
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-//Set the content type to application/json
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-
-//Execute the request
-    global $json;
-    $json = curl_exec($ch);
-    $json = json_decode($json, true);
-    curl_close($ch);
 }
 
 function deleteMatch($id){
@@ -73,19 +82,23 @@ function deleteMatch($id){
     curl_close($ch);
 }
 
-function getFormatedTime($timestamp){
-    $timestamp = strtotime($timestamp);
-    $day_night_txt = "";
+function getFormatedType($type){
 
-    $hours = date('H', $timestamp);
-    if($hours > 12)
-        $day_night_txt = "مساءا";
-    else
-        $day_night_txt = "صباحا";
+    if($type === "goal"){
+        return "هدف";
+    }else if($type === "yellowcard"){
+        return "كارت اصفر";
+    }else if($type === "redcard"){
+        return "كارت احمر";
+    }else if($type === "subst"){
+        return "تبديل";
+    }
+    else{
+        return "";
+    }
 
-    $time = date('h:i', $timestamp);
-    return $time. " " . $day_night_txt;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -139,11 +152,11 @@ function getFormatedTime($timestamp){
                     <div class="row" style="margin-bottom: 50px">
                         <div class="col-md-20">
                             <div class="overview-wrap">
-                                <h2 class="title-1">جدول المبارايات</h2>
+                                <h2 class="title-1">جدول الاحداث</h2>
 
-                                <button class="au-btn au-btn-icon au-btn--blue" style="margin-right: 200px" onclick="location.href='addNewMatch.php'">
+                                <button class="au-btn au-btn-icon au-btn--blue" style="margin-right: 200px" onclick="location.href='addNewEvent.php?id=<?php echo $_GET['match_id']?>'">
                                     <i class="zmdi zmdi-plus"></i>
-                                    اضافة مباراة</button>
+                                    اضافة حدث</button>
                             </div>
                         </div>
                     </div>
@@ -154,35 +167,32 @@ function getFormatedTime($timestamp){
                                 <table class="table table-borderless table-striped table-earning">
                                     <thead>
                                     <tr>
-                                        <th>اسم الدوري</th>
-                                        <th>اسم الفريق صاحب الملعب</th>
-                                        <th>اسم الفريق الضيف</th>
-                                        <th>التاريخ</th>
-                                        <th>الوقت</th>
-                                        <th class="text-right">احداث المباراة</th>
-                                        <th class="text-right">تعديل</th>
+                                        <th>نوع الحدث</th>
+                                        <th>الدقيقة</th>
+                                        <th>الفريق</th>
+                                        <th>اسم اللاعب</th>
+                                        <th>صانع اللعبة</th>
                                         <th class="text-right">حذف</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <!--Print All the Matches-->
+
+                                    <!--Print All the Events-->
                                     <?php
 
                                     global $json;
 
-                                    if(key_exists("matches", $json)) {
-                                        foreach ($json['matches'] as $match){
+                                    if(key_exists("events", $json)) {
+                                        foreach ($json['events'] as $event){
 
 
                                             echo "<tr>
-                                                    <td class=\"text-left\">".$match['league_name']."</td>
-                                                    <td class=\"text-left\">".$match['localteam_name']."</td>
-                                                    <td class=\"text-left\">".$match['visitorteam_name']."</td>
-                                                    <td class=\"text-left\">".$match['date']."</td>
-                                                    <td class=\"text-left\">".getFormatedTime($match['time'])."</td>
-                                                    <td class=\"text-left\"><a href='matchEvents.php?match_id=".$match['id']."'>Match Events</a></td>
-                                                    <td class=\"text-left\"><a href='updateMatch.php?id=".$match['id']."'>Update</a></td>
-                                                    <td class=\"text-left\"><a href='index.php?id=".$match['id']."'>Delete</a></td>
+                                                    <td class=\"text-left\">".getFormatedType($event['type'])."</td>
+                                                    <td class=\"text-left\">".$event['minute']."</td>
+                                                    <td class=\"text-left\">".$event['team']."</td>
+                                                    <td class=\"text-left\">".$event['player']."</td>
+                                                    <td class=\"text-left\">".$event['assist']."</td>
+                                                    <td class=\"text-left\"><a href='matchEvents.php?id=".$event['id']."'>Delete</a></td>
                                                 </tr>";
                                             }
                                     }
