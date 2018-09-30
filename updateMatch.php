@@ -1,5 +1,7 @@
 <?php
 
+getLeagues();
+
 global $id;
 
 if(isset($_GET['id'])){
@@ -53,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'visitorteam_score' =>  $_POST['visitorteam_score'],
         'date' => $_POST['date'],
         'time' =>$_POST['time'],
+        'league_id' =>$_POST['league_id'],
     );
 
     $jsonDataEncoded = json_encode($jsonData);
@@ -73,6 +76,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     curl_close($ch);
 
     header("Location: index.php");
+}
+
+function getLeagues(){
+    $url = "http://localhost/FootballAPI/API/league/read.php";
+//Initiate cURL.
+    $ch = curl_init($url);
+
+
+//Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+//Execute the request
+    global $leagues_json;
+    $leagues_json = curl_exec($ch);
+    $leagues_json = json_decode($leagues_json, true);
+    curl_close($ch);
 }
 
 
@@ -133,6 +157,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                     <hr>
                                     <form action="updateMatch.php?id=<?php echo $_GET['id'];?>" method="post" name="updateMatchForm" onsubmit="return validateForm()" >
+
+                                        <div class="form-group has-success">
+                                            <label for="cc-name" class="control-label mb-1">اختر الدوري</label>
+                                            <select name="league_id" dir="rtl" class="form-control">
+                                                <!--Print All the Leagues In the selection-->
+                                                <?php
+
+                                                global $leagues_json;
+
+                                                if(key_exists("leagues", $leagues_json)) {
+                                                    foreach ($leagues_json['leagues'] as $league){
+                                                        echo "<option value=\"".$league['id']."\" ";
+                                                        if($league['id'] == $match['league_id'])
+                                                            echo "selected=\"selected\"";
+                                                        echo ">".$league['league_name']."</option>";
+                                                    }
+                                                }
+
+                                                ?>
+                                            </select>
+                                        </div>
 
                                         <div class="form-group">
                                             <label for="cc-payment" class="control-label mb-1">اسم الفريق صاحب الملعب</label>

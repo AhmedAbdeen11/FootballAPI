@@ -1,9 +1,9 @@
 <?php
-class Match{
+class Event{
 
     // database connection and table name
     private $conn;
-    private $table_name = "matches";
+    private $table_name = "events";
 
     // object properties
     public $id;
@@ -13,7 +13,6 @@ class Match{
     public $visitorteam_score;
     public $date;
     public $time;
-    public $league_id;
 
     // constructor with $db as database connection
     public function __construct($db){
@@ -26,13 +25,10 @@ class Match{
 
         // select all query
         $query = "SELECT
-                p.id, p.localteam_name, p.localteam_score, p.visitorteam_name, p.visitorteam_score, p.date, p.time, p.league_id, m.league_name
+                p.id, p.localteam_name, p.localteam_score, p.visitorteam_name, p.visitorteam_score, p.date, p.time
             FROM
                 " . $this->table_name . " p
-            LEFT JOIN
-                leagues m
-            ON p.league_id = m.id
-            ORDER BY p.date DESC, p.league_id ASC, p.time DESC";
+            ORDER BY p.date DESC, p.time DESC";
 
         // prepare query statement
         $stmt = $this->conn->prepare($query);
@@ -47,7 +43,7 @@ class Match{
 
         // query to read single record
         $query = "SELECT
-                 p.id, p.localteam_name, p.localteam_score, p.visitorteam_name, p.visitorteam_score, p.date, p.time, p.league_id
+                 p.id, p.localteam_name, p.localteam_score, p.visitorteam_name, p.visitorteam_score, p.date, p.time
             FROM
                 " . $this->table_name . " p
             WHERE
@@ -77,8 +73,7 @@ class Match{
                 visitorteam_name=:visitorteam_name,
                 visitorteam_score=:visitorteam_score,
                 date=:date,
-                time=:time,
-                league_id=:league_id";
+                time=:time";
 
         // prepare query
         $stmt = $this->conn->prepare($query);
@@ -90,7 +85,6 @@ class Match{
         $this->visitorteam_score=htmlspecialchars(strip_tags($this->visitorteam_score));
         $this->date=htmlspecialchars(strip_tags($this->date));
         $this->time=htmlspecialchars(strip_tags($this->time));
-        $this->league_id=htmlspecialchars(strip_tags($this->league_id));
 
         // bind values
         $stmt->bindParam(":localteam_name", $this->localteam_name);
@@ -99,7 +93,6 @@ class Match{
         $stmt->bindParam(":visitorteam_score", $this->visitorteam_score);
         $stmt->bindParam(":date", $this->date);
         $stmt->bindParam(":time", $this->time);
-        $stmt->bindParam(":league_id", $this->league_id);
 
         // execute query
         if($stmt->execute()){
@@ -122,8 +115,7 @@ class Match{
                 visitorteam_name=:visitorteam_name,
                 visitorteam_score=:visitorteam_score,
                 date=:date,
-                time=:time,
-                league_id=:league_id
+                time=:time
                 
             WHERE
                 id = :id";
@@ -138,7 +130,6 @@ class Match{
         $this->visitorteam_score=htmlspecialchars(strip_tags($this->visitorteam_score));
         $this->date=htmlspecialchars(strip_tags($this->date));
         $this->time=htmlspecialchars(strip_tags($this->time));
-        $this->league_id=htmlspecialchars(strip_tags($this->league_id));
         $this->id=htmlspecialchars(strip_tags($this->id));
 
         // bind values
@@ -148,7 +139,6 @@ class Match{
         $stmt->bindParam(":visitorteam_score", $this->visitorteam_score);
         $stmt->bindParam(":date", $this->date);
         $stmt->bindParam(":time", $this->time);
-        $stmt->bindParam(":league_id", $this->league_id);
         $stmt->bindParam(':id', $this->id);
 
         // execute the query

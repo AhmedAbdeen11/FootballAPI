@@ -154,6 +154,7 @@ function getFormatedTime($timestamp){
                                 <table class="table table-borderless table-striped table-earning">
                                     <thead>
                                     <tr>
+                                        <th>اسم الدوري</th>
                                         <th>اسم الفريق صاحب الملعب</th>
                                         <th>اسم الفريق الضيف</th>
                                         <th>التاريخ</th>
@@ -173,6 +174,7 @@ function getFormatedTime($timestamp){
 
 
                                             echo "<tr>
+                                                    <td class=\"text-left\">".$match['league_name']."</td>
                                                     <td class=\"text-left\">".$match['localteam_name']."</td>
                                                     <td class=\"text-left\">".$match['visitorteam_name']."</td>
                                                     <td class=\"text-left\">".$match['date']."</td>

@@ -46,7 +46,8 @@ if($num>0){
             "visitorteam_name" => html_entity_decode($visitorteam_name),
             "visitorteam_score" => html_entity_decode($visitorteam_score),
             "date" => $date,
-            "time" => $time
+            "time" => $time,
+            "league_id" => $league_id
         );
 
         array_push($matches_arr, $match_data);

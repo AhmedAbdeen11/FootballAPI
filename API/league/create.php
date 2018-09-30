@@ -10,38 +10,32 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // get database connection
 include_once '../config/database.php';
 
-// instantiate match object
-include_once '../objects/match.php';
+// instantiate league object
+include_once '../objects/league.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$match = new Match($db);
+$league = new League($db);
 
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
 
-// set match property values
-$match->localteam_name = $data->localteam_name;
-$match->localteam_score = $data->localteam_score;
-$match->visitorteam_name = $data->visitorteam_name;
-$match->visitorteam_score = $data->visitorteam_score;
-$match->date = $data->date;
-$match->time = $data->time;
-$match->league_id = $data->league_id;
+// set league property values
+$league->league_name = $data->league_name;
 
-// create the match
-if($match->create()){
+// create the league
+if($league->create()){
 
     echo '{';
-    echo '"message": "Match created."';
+    echo '"message": "League created."';
     echo '}';
 }
 
-// if unable to signup, tell the match
+// if unable to signup, tell the league
 else{
     http_response_code(404);
     echo '{';
-    echo '"message": "Failed to create match."';
+    echo '"message": "Failed to create league."';
     echo '}';
 }

@@ -29,6 +29,7 @@ $match->visitorteam_name = $data->visitorteam_name;
 $match->visitorteam_score = $data->visitorteam_score;
 $match->date = $data->date;
 $match->time = $data->time;
+$match->league_id = $data->league_id;
 
 // create the match
 if($match->update()){
