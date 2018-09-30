@@ -50,12 +50,12 @@ if(isset($_GET['match_id'])){
 
 function checkDeleteRequest(){
     if(isset($_GET['id'])){
-        deleteMatch($_GET['id']);
+        deleteEvent($_GET['id']);
     }
 }
 
-function deleteMatch($id){
-    $url = "http://localhost/FootballAPI/API/match/delete.php";
+function deleteEvent($id){
+    $url = "http://localhost/FootballAPI/API/event/delete.php";
     $ch = curl_init($url);
 
     //The JSON data.
@@ -157,6 +157,10 @@ function getFormatedType($type){
                                 <button class="au-btn au-btn-icon au-btn--blue" style="margin-right: 200px" onclick="location.href='addNewEvent.php?id=<?php echo $_GET['match_id']?>'">
                                     <i class="zmdi zmdi-plus"></i>
                                     اضافة حدث</button>
+
+                                <button class="au-btn au-btn-icon au-btn--blue" onclick="location.href='index.php'"
+                                style="margin-right: 40px">
+                                    الصفحة الرئيسية</button>
                             </div>
                         </div>
                     </div>
@@ -192,7 +196,7 @@ function getFormatedType($type){
                                                     <td class=\"text-left\">".$event['team']."</td>
                                                     <td class=\"text-left\">".$event['player']."</td>
                                                     <td class=\"text-left\">".$event['assist']."</td>
-                                                    <td class=\"text-left\"><a href='matchEvents.php?id=".$event['id']."'>Delete</a></td>
+                                                    <td class=\"text-left\"><a href='matchEvents.php?id=".$event['id']."&match_id=".$event['match_id']."'>Delete</a></td>
                                                 </tr>";
                                             }
                                     }

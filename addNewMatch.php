@@ -36,9 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = curl_exec($ch);
     curl_close($ch);
 
-
-
-//    header("Location index.php");
+    header("Location: index.php");
 }
 
 
