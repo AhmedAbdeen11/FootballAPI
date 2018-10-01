@@ -21,7 +21,7 @@ $data = json_decode(file_get_contents("php://input"));
 // set event property values
 $event->match_id = $data->match_id;
 
-// query products
+// query events
 $stmt = $event->readEventsByMatchId();
 $num = $stmt->rowCount();
 

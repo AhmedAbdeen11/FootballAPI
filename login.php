@@ -65,7 +65,7 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
             <div class="login-wrap">
                 <div class="login-content">
                     <div class="login-logo">
-                        <!--<img src="images/icon/logo.jpg" alt="اولادي">-->
+                        <img src="images/icon/logo.jpg" alt="اولادي" style="width: 300px;height: 300px">
                     </div>
                     <div class="login-form">
                         <form action="login.php" method="post">

@@ -43,6 +43,37 @@ class Match{
         return $stmt;
     }
 
+    // read all matches By League Id and Date
+    function readMatchesByDateAndCompId(){
+
+        // select all query
+        $query = "SELECT
+                p.id as match_id, p.localteam_name, p.localteam_score, p.visitorteam_name, p.visitorteam_score, DATE_FORMAT(p.date, '%d.%m.%Y') AS formatted_date,
+                 DATE_FORMAT(p.time, '%H:%i') AS time, p.league_id
+            FROM
+                " . $this->table_name . " p
+            WHERE
+                p.league_id = ? AND p.date = ?
+            ORDER BY 
+                p.time DESC";
+
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->league_id=htmlspecialchars(strip_tags($this->league_id));
+        $this->date=htmlspecialchars(strip_tags($this->date));
+
+        // bind values
+        $stmt->bindParam(1, $this->league_id);
+        $stmt->bindParam(2, $this->date);
+
+        // execute query
+        $stmt->execute();
+
+        return $stmt;
+    }
+
     function readMatchById(){
 
         // query to read single record
