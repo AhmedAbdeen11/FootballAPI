@@ -34,7 +34,7 @@ class Event{
             WHERE
                 p.match_id = ?
             ORDER BY
-                p.minute DESC";
+                p.minute ASC";
 
         // prepare query statement
         $stmt = $this->conn->prepare( $query );
@@ -48,7 +48,7 @@ class Event{
         return $stmt;
     }
 
-    // create match
+    // create event
     function create(){
 
         // query to insert record
@@ -89,7 +89,53 @@ class Event{
         }
     }
 
-    // delete match
+    // Update Event
+    function update(){
+
+        // update query
+        $query = "UPDATE
+                " . $this->table_name . "
+            SET
+                type=:type,
+                minute=:minute,
+                team=:team,
+                player=:player,
+                assist=:assist,
+                match_id=:match_id
+                
+            WHERE
+                id = :id";
+
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->type=htmlspecialchars(strip_tags($this->type));
+        $this->minute=htmlspecialchars(strip_tags($this->minute));
+        $this->team=htmlspecialchars(strip_tags($this->team));
+        $this->player=htmlspecialchars(strip_tags($this->player));
+        $this->assist=htmlspecialchars(strip_tags($this->assist));
+        $this->match_id=htmlspecialchars(strip_tags($this->match_id));
+        $this->id=htmlspecialchars(strip_tags($this->id));
+
+        // bind values
+        $stmt->bindParam(":type", $this->type);
+        $stmt->bindParam(":minute", $this->minute);
+        $stmt->bindParam(":team", $this->team);
+        $stmt->bindParam(":player", $this->player);
+        $stmt->bindParam(":assist", $this->assist);
+        $stmt->bindParam(":match_id", $this->match_id);
+        $stmt->bindParam(':id', $this->id);
+
+        // execute the query
+        if($stmt->execute()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    // delete event
     function delete(){
 
         // delete query
