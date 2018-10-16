@@ -19,17 +19,16 @@ $event = new Event($db);
 $data = json_decode(file_get_contents("php://input"));
 
 // set event property values
-$event->match_id = $data->match_id;
+$event->id = $data->id;
 
-// query events
-$stmt = $event->readEventsByMatchId();
+$stmt = $event->readEventById();
 $num = $stmt->rowCount();
 
 // check if more than 0 record found
 if($num>0){
 
     // events array
-    $events_arr=array();
+    $eventes_arr=array();
 
     // retrieve our table contents
     // fetch() is faster than fetchAll()
@@ -40,28 +39,19 @@ if($num>0){
         // just $name only
         extract($row);
 
-        $team_formatted_name = "";
-        if($team == "localteam"){
-            $team_formatted_name = $localteam_name;
-
-        }else if($team == "visitorteam"){
-            $team_formatted_name = $visitorteam_name;
-        }else{
-            // No Action
-        }
-
         $event_data = array(
             "id" => $id,
             "type" => html_entity_decode($type),
             "minute" => html_entity_decode($minute),
-            "team" => html_entity_decode($team_formatted_name),
+            "team" => html_entity_decode($team),
             "player" => html_entity_decode($player),
-            "match_id" => $match_id);
+            "match_id" => $match_id
+        );
 
-        array_push($events_arr, $event_data);
+        array_push($eventes_arr, $event_data);
     }
 
-    $response['events'] = $events_arr;
+    $response['events'] = $eventes_arr;
     echo json_encode($response);
 }
 

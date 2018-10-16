@@ -26,7 +26,6 @@ $event->type = $data->type;
 $event->minute = $data->minute;
 $event->team = $data->team;
 $event->player = $data->player;
-$event->assist = $data->assist;
 $event->match_id = $data->match_id;
 
 // create the event

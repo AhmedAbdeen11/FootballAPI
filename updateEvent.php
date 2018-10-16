@@ -4,6 +4,8 @@ global $id;
 
 if(isset($_GET['id'])){
 
+    //------- Get Match Data---------------//
+
     $id = $_GET['id'];
 
     $url = "http://localhost/FootballAPI/API/match/readMatchById.php";
@@ -12,7 +14,7 @@ if(isset($_GET['id'])){
 
     //The JSON data.
     $jsonData = array(
-        'id' => $_GET['id']
+        'id' => $id
     );
 
     $jsonDataEncoded = json_encode($jsonData);
@@ -34,21 +36,54 @@ if(isset($_GET['id'])){
     $json = $json["matches"];
     $match = $json[0];
     curl_close($ch);
+
+
+    //------- Get Event Data---------------//
+    $event_id = $_GET['event_id'];
+
+    $url = "http://localhost/FootballAPI/API/event/readEventById.php";
+//Initiate cURL.
+    $ch = curl_init($url);
+
+    //The JSON data.
+    $jsonData = array(
+        'id' => $event_id
+    );
+
+    $jsonDataEncoded = json_encode($jsonData);
+
+//Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+//Execute the request
+    global $event;
+    $json = curl_exec($ch);
+    $json = json_decode($json, true);
+    $json = $json["events"];
+    $event = $json[0];
+    curl_close($ch);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $url = "http://localhost/FootballAPI/API/event/create.php";
+    $url = "http://localhost/FootballAPI/API/event/update.php";
     //Initiate cURL.
     $ch = curl_init($url);
 
     //The JSON data.
     $jsonData = array(
+        'id' => $_GET['event_id'],
         'type' => $_POST['type'],
         'minute' => $_POST['minute'],
         'team' => $_POST['team'],
         'player' =>  $_POST['player'],
-        'match_id' => $_POST['match_id'],
     );
 
     $jsonDataEncoded = json_encode($jsonData);
@@ -68,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = curl_exec($ch);
     curl_close($ch);
 
-    $header_string = "Location: matchEvents.php?match_id=" . $_POST['match_id'];
+    $header_string = "Location: matchEvents.php?match_id=" . $_GET['id'];
     header($header_string);
 }
 
@@ -126,43 +161,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-title">
-                                        <h3 class="text-center title-2">اضافة حدث</h3>
+                                        <h3 class="text-center title-2">تعديل حدث</h3>
                                     </div>
                                     <!--<button class="au-btn au-btn-icon au-btn--blue" onclick="location.href='index.php'">
                                         الصفحة الرئيسية</button>-->
                                     <hr>
-                                    <form action="addNewEvent.php" method="post" name="addEventForm" onsubmit="return validateForm()" >
-
-                                        <div class="form-group"  style="display: none;">
-                                            <label for="cc-payment" class="control-label mb-1">Match Id</label>
-                                            <input id="cc-pament" name="match_id" type="text" class="form-control" aria-required="true" aria-invalid="false"
-                                            value="<?php echo $match['id']?>">
-                                        </div>
+                                    <form action="updateEvent.php?id=<?php echo $event['match_id']; ?>&event_id=<?php echo $event['id']; ?>" method="post" name="addEventForm" onsubmit="return validateForm()" >
 
                                         <div class="form-group has-success">
                                             <label for="cc-name" class="control-label mb-1">نوع الحدث</label>
                                             <select name="type" dir="rtl" class="form-control">
-                                                <!--Print All the Leagues In the selection-->
-                                                <option value="goal">هدف</option>
-                                                <option value="subst">تبديل</option>
-                                                <option value="yellowcard">كارت اصفر</option>
-                                                <option value="redcard">كارت احمر</option>
+
+                                                <?php
+
+                                                echo "<option value=\"goal\"";
+                                                if($event['type'] === 'goal')
+                                                    echo "selected=\"selected\"";
+                                                echo ">هدف</option>";
+
+                                                echo "<option value=\"subst\"";
+                                                if($event['type'] === 'subst')
+                                                    echo "selected=\"selected\"";
+                                                echo ">تبديل</option>";
+
+                                                echo "<option value=\"yellowcard\"";
+                                                if($event['type'] === 'yellowcard')
+                                                    echo "selected=\"selected\"";
+                                                echo ">كارت اصفر</option>";
+
+                                                echo "<option value=\"redcard\"";
+                                                if($event['type'] === 'redcard')
+                                                    echo "selected=\"selected\"";
+                                                echo ">كارت احمر</option>";
+
+                                                ?>
+
                                             </select>
                                         </div>
 
                                         <div class="form-group">
                                             <label for="cc-payment" class="control-label mb-1">الدقيقة</label>
-                                            <input id="cc-pament" name="minute" type="text" class="form-control" aria-required="true" aria-invalid="false">
+                                            <input id="cc-pament" name="minute" type="text" class="form-control" aria-required="true" aria-invalid="false"
+                                            value="<?php echo $event['minute']; ?>">
                                         </div>
 
                                         <div class="form-group has-success">
                                             <label for="cc-name" class="control-label mb-1">الفريق</label>
                                             <select name="team" dir="rtl" class="form-control">
-                                                <!--Print All the Leagues In the selection-->
+
                                                 <?php
 
-                                                echo "<option value=\"localteam\">".$match['localteam_name']."</option>";
-                                                echo "<option value=\"visitorteam\">".$match['visitorteam_name']."</option>";
+                                                echo "<option value=\"localteam\"";
+                                                if($event['team'] === 'localteam')
+                                                    echo "selected=\"selected\"";
+                                                echo ">".$match['localteam_name']."</option>";
+
+                                                echo "<option value=\"visitorteam\"";
+                                                if($event['team'] === 'visitorteam')
+                                                    echo "selected=\"selected\"";
+                                                echo ">".$match['visitorteam_name']."</option>";
 
                                                 ?>
                                             </select>
@@ -170,11 +227,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                                         <div class="form-group">
                                             <label for="cc-payment" class="control-label mb-1">اسم اللاعب</label>
-                                            <input id="cc-pament" name="player" type="text" class="form-control" aria-required="true" aria-invalid="false">
+                                            <input id="cc-pament" name="player" type="text" class="form-control" aria-required="true" aria-invalid="false"
+                                            value="<?php echo $event['player']; ?>">
                                         </div>
 
                                         <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block">
-                                            <span id="payment-button-amount">اضافة</span>
+                                            <span id="payment-button-amount">حفظ</span>
                                         </button>
                                 </div>
                                 </form>

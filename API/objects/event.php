@@ -11,7 +11,6 @@ class Event{
     public $minute;
     public $team;
     public $player;
-    public $assist;
     public $match_id;
 
     // constructor with $db as database connection
@@ -24,7 +23,7 @@ class Event{
 
         // query to read single record
         $query = "SELECT
-                 p.id, p.type, p.minute, p.team, p.player, p.assist, p.match_id, m.localteam_name, m.visitorteam_name
+                 p.id, p.type, p.minute, p.team, p.player, p.match_id, m.localteam_name, m.visitorteam_name
             FROM
                 " . $this->table_name . " p
             LEFT JOIN
@@ -59,7 +58,6 @@ class Event{
                 minute=:minute,
                 team=:team,
                 player=:player,
-                assist=:assist,
                 match_id=:match_id";
 
         // prepare query
@@ -70,7 +68,6 @@ class Event{
         $this->minute=htmlspecialchars(strip_tags($this->minute));
         $this->team=htmlspecialchars(strip_tags($this->team));
         $this->player=htmlspecialchars(strip_tags($this->player));
-        $this->assist=htmlspecialchars(strip_tags($this->assist));
         $this->match_id=htmlspecialchars(strip_tags($this->match_id));
 
         // bind values
@@ -78,7 +75,6 @@ class Event{
         $stmt->bindParam(":minute", $this->minute);
         $stmt->bindParam(":team", $this->team);
         $stmt->bindParam(":player", $this->player);
-        $stmt->bindParam(":assist", $this->assist);
         $stmt->bindParam(":match_id", $this->match_id);
 
         // execute query
@@ -99,10 +95,7 @@ class Event{
                 type=:type,
                 minute=:minute,
                 team=:team,
-                player=:player,
-                assist=:assist,
-                match_id=:match_id
-                
+                player=:player                
             WHERE
                 id = :id";
 
@@ -114,8 +107,6 @@ class Event{
         $this->minute=htmlspecialchars(strip_tags($this->minute));
         $this->team=htmlspecialchars(strip_tags($this->team));
         $this->player=htmlspecialchars(strip_tags($this->player));
-        $this->assist=htmlspecialchars(strip_tags($this->assist));
-        $this->match_id=htmlspecialchars(strip_tags($this->match_id));
         $this->id=htmlspecialchars(strip_tags($this->id));
 
         // bind values
@@ -123,8 +114,6 @@ class Event{
         $stmt->bindParam(":minute", $this->minute);
         $stmt->bindParam(":team", $this->team);
         $stmt->bindParam(":player", $this->player);
-        $stmt->bindParam(":assist", $this->assist);
-        $stmt->bindParam(":match_id", $this->match_id);
         $stmt->bindParam(':id', $this->id);
 
         // execute the query
@@ -133,6 +122,28 @@ class Event{
         }else{
             return false;
         }
+    }
+
+    function readEventById(){
+
+        // query to read single record
+        $query = "SELECT
+                 p.id, p.type, p.minute, p.team, p.player, p.match_id
+            FROM
+                " . $this->table_name . " p
+            WHERE
+                p.id = ?";
+
+        // prepare query statement
+        $stmt = $this->conn->prepare( $query );
+
+        // bind id of product to be updated
+        $stmt->bindParam(1, $this->id);
+
+        // execute query
+        $stmt->execute();
+
+        return $stmt;
     }
 
     // delete event

@@ -175,7 +175,7 @@ function getFormatedType($type){
                                         <th>الدقيقة</th>
                                         <th>الفريق</th>
                                         <th>اسم اللاعب</th>
-                                        <th>صانع اللعبة</th>
+                                        <th class="text-right">تعديل</th>
                                         <th class="text-right">حذف</th>
                                     </tr>
                                     </thead>
@@ -195,7 +195,8 @@ function getFormatedType($type){
                                                     <td class=\"text-left\">".$event['minute']."</td>
                                                     <td class=\"text-left\">".$event['team']."</td>
                                                     <td class=\"text-left\">".$event['player']."</td>
-                                                    <td class=\"text-left\">".$event['assist']."</td>
+                                                    <td class=\"text-left\"><a href='updateEvent.php?id=".$event['match_id']."&event_id=".$event['id']."'>Update</a></td>
+                                                    
                                                     <td class=\"text-left\"><a href='matchEvents.php?id=".$event['id']."&match_id=".$event['match_id']."'>Delete</a></td>
                                                 </tr>";
                                             }
