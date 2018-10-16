@@ -33,6 +33,32 @@ class League{
         return $stmt;
     }
 
+    // read league name
+    function readLeagueName(){
+
+        // select all query
+        $query = "SELECT
+                p.id, p.league_name
+            FROM
+                " . $this->table_name . " p
+            WHERE
+                p.id = ?";
+
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->id=htmlspecialchars(strip_tags($this->id));
+
+        // bind values
+        $stmt->bindParam(1, $this->id);
+
+        // execute query
+        $stmt->execute();
+
+        return $stmt;
+    }
+
     // create match
     function create(){
 

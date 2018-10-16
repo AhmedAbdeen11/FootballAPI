@@ -2,7 +2,10 @@
 
 
 //checkLogin();
-getLeagues();
+checkDeleteRequest();
+checkDeleteAllMatchesRequest();
+getLeagueName();
+getMatches();
 
 
 
@@ -17,14 +20,62 @@ getLeagues();
 }
 }*/
 
-function getLeagues(){
-    $url = "http://localhost/FootballAPI/API/league/read.php";
+function checkDeleteRequest(){
+    if(isset($_GET['id'])){
+        deleteMatch($_GET['id']);
+    }
+}
+
+function checkDeleteAllMatchesRequest(){
+    if(isset($_GET['deleteAllMatches'])){
+        deleteAllMatches($_GET['league_id']);
+    }
+}
+
+function getLeagueName(){
+    $url = "http://localhost/FootballAPI/API/league/readLeagueName.php";
 //Initiate cURL.
     $ch = curl_init($url);
 
+    //The JSON data.
+    $jsonData = array(
+        'id' => $_GET['league_id']
+    );
 
+    $jsonDataEncoded = json_encode($jsonData);
 //Tell cURL that we want to send a POST request.
     curl_setopt($ch, CURLOPT_POST, 1);
+
+//Attach our encoded JSON string to the POST fields.
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+//Execute the request
+    global $league_name;
+    $league_name = curl_exec($ch);
+    curl_close($ch);
+}
+
+function getMatches(){
+    $url = "http://localhost/FootballAPI/API/match/readMatchesByLeagueId.php";
+//Initiate cURL.
+    $ch = curl_init($url);
+
+    //The JSON data.
+    $jsonData = array(
+        'league_id' => $_GET['league_id']
+    );
+
+    $jsonDataEncoded = json_encode($jsonData);
+//Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+
+//Attach our encoded JSON string to the POST fields.
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
@@ -38,6 +89,75 @@ function getLeagues(){
     curl_close($ch);
 }
 
+function deleteMatch($id){
+    $url = "http://localhost/FootballAPI/API/match/delete.php";
+    $ch = curl_init($url);
+
+    //The JSON data.
+    $jsonData = array(
+        'id' => $id
+    );
+
+    $jsonDataEncoded = json_encode($jsonData);
+
+//Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+
+//Attach our encoded JSON string to the POST fields.
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+//Execute the request
+    $json = curl_exec($ch);
+    $json = json_decode($json, true);
+    curl_close($ch);
+}
+
+function deleteAllMatches($league_id){
+    $url = "http://localhost/FootballAPI/API/match/deleteAllMatchesByLeagueId.php";
+    $ch = curl_init($url);
+
+    //The JSON data.
+    $jsonData = array(
+        'league_id' => $league_id
+    );
+
+    $jsonDataEncoded = json_encode($jsonData);
+
+//Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+
+//Attach our encoded JSON string to the POST fields.
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+//Execute the request
+    $json = curl_exec($ch);
+    $json = json_decode($json, true);
+    curl_close($ch);
+}
+
+function getFormatedTime($timestamp){
+    $timestamp = strtotime($timestamp);
+    $day_night_txt = "";
+
+    $hours = date('H', $timestamp);
+    if($hours > 12)
+        $day_night_txt = "مساءا";
+    else
+        $day_night_txt = "صباحا";
+
+    $time = date('h:i', $timestamp);
+    return $time. " " . $day_night_txt;
+}
 ?>
 
 <!DOCTYPE html>
@@ -91,7 +211,27 @@ function getLeagues(){
                     <div class="row" style="margin-bottom: 50px">
                         <div class="col-md-20">
                             <div class="overview-wrap">
-                                <h2 class="title-1">الدوريات</h2>
+                                <h2 class="title-1">
+                                    <?php
+
+                                    global $league_name;
+
+                                    echo $league_name;
+
+                                    ?>
+                                </h2>
+
+                                <button class="au-btn au-btn-icon au-btn--blue" style="margin-right: 200px" onclick="location.href='addNewMatch.php'">
+                                    <i class="zmdi zmdi-plus"></i>
+                                    اضافة مباراة</button>
+
+                                <button class="au-btn au-btn-icon au-btn--blue" onclick="location.href='index.php'"
+                                        style="margin-right: 40px">
+                                    الصفحة الرئيسية</button>
+
+                                <button class="au-btn au-btn-icon au-btn--blue" onclick="location.href='matches.php?league_id=<?php echo $_GET['league_id']?>&deleteAllMatches=true'"
+                                        style="margin-right: 40px">
+                                    حذف جميع المباريات</button>
                             </div>
                         </div>
                     </div>
@@ -102,8 +242,13 @@ function getLeagues(){
                                 <table class="table table-borderless table-striped table-earning">
                                     <thead>
                                     <tr>
-                                        <th>اسم الدوري</th>
-                                        <th class="text-right">المباريات</th>
+                                        <th>اسم الفريق صاحب الملعب</th>
+                                        <th>اسم الفريق الضيف</th>
+                                        <th>التاريخ</th>
+                                        <th>الوقت</th>
+                                        <th class="text-right">احداث المباراة</th>
+                                        <th class="text-right">تعديل</th>
+                                        <th class="text-right">حذف</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -112,13 +257,18 @@ function getLeagues(){
 
                                     global $json;
 
-                                    if(key_exists("leagues", $json)) {
-                                        foreach ($json['leagues'] as $league){
+                                    if(key_exists("matches", $json)) {
+                                        foreach ($json['matches'] as $match){
 
 
                                             echo "<tr>
-                                                    <td class=\"text-left\">".$league['league_name']."</td>
-                                                    <td class=\"text-left\"><a href='matches.php?league_id=".$league['id']."'>League Matches</a></td>
+                                                    <td class=\"text-left\">".$match['localteam_name']."</td>
+                                                    <td class=\"text-left\">".$match['visitorteam_name']."</td>
+                                                    <td class=\"text-left\">".$match['date']."</td>
+                                                    <td class=\"text-left\">".getFormatedTime($match['time'])."</td>
+                                                    <td class=\"text-left\"><a href='matchEvents.php?match_id=".$match['id']."'>Match Events</a></td>
+                                                    <td class=\"text-left\"><a href='updateMatch.php?id=".$match['id']."'>Update</a></td>
+                                                    <td class=\"text-left\"><a href='matches.php?id=".$match['id']."&league_id=".$match['league_id']."'>Delete</a></td>
                                                 </tr>";
                                             }
                                     }

@@ -43,6 +43,36 @@ class Match{
         return $stmt;
     }
 
+    // read all matches
+    function readMatchesByLeagueId(){
+
+        // select all query
+        $query = "SELECT
+                p.id, p.localteam_name, p.localteam_score, p.visitorteam_name, p.visitorteam_score, p.date, p.time, p.league_id, m.league_name
+            FROM
+                " . $this->table_name . " p
+            LEFT JOIN
+                leagues m
+            ON p.league_id = m.id
+            WHERE
+                p.league_id = ?
+            ORDER BY p.date DESC, p.league_id ASC, p.time DESC";
+
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->league_id=htmlspecialchars(strip_tags($this->league_id));
+
+        // bind values
+        $stmt->bindParam(1, $this->league_id);
+
+        // execute query
+        $stmt->execute();
+
+        return $stmt;
+    }
+
     // read all matches By League Id and Date
     function readMatchesByDateAndCompId(){
 
@@ -204,6 +234,29 @@ class Match{
 
         // bind id of record to delete
         $stmt->bindParam(1, $this->id);
+
+        // execute query
+        if($stmt->execute()){
+            return true;
+        }id:
+
+        return false;
+    }
+
+    // delete all matches by league id
+    function deleteAllMatchesByLeagueId(){
+
+        // delete query
+        $query = "DELETE FROM " . $this->table_name . " WHERE league_id = ?";
+
+        // prepare query
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->league_id=htmlspecialchars(strip_tags($this->league_id));
+
+        // bind id of record to delete
+        $stmt->bindParam(1, $this->league_id);
 
         // execute query
         if($stmt->execute()){

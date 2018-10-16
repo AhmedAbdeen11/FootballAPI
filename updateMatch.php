@@ -75,7 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = curl_exec($ch);
     curl_close($ch);
 
-    header("Location: index.php");
+    $header_string = "Location: matches.php?league_id=" . $_POST['league_id'];
+    header($header_string);
 }
 
 function getLeagues(){
